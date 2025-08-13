@@ -1,12 +1,10 @@
-import { Pool } from "pg";
+﻿import { getPool } from "../../../lib/db";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // keep ?sslmode=require in URL
-  ssl: { rejectUnauthorized: false },
-});
+export const runtime = "nodejs"; // ensure Node runtime (not Edge)
 
 export default async function handler(req, res) {
   try {
+    const pool = getPool();
     await pool.query("select 1");
     res.status(200).json({ status: "ok", db: true });
   } catch (e) {
