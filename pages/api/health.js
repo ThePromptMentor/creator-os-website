@@ -1,15 +1,15 @@
-// pages/api/health.js
-const db = require('../../lib/db');
+import { Pool } from "pg";
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: true },
+});
 
 export default async function handler(req, res) {
   try {
-    const result = await db.query('SELECT 1 AS ok');
-    if (result && result.rows && result.rows[0].ok === 1) {
-      return res.status(200).json({ status: 'ok', db: true });
-    }
-    return res.status(500).json({ status: 'error', db: false });
-  } catch (err) {
-    console.error('Health check DB error:', err);
-    return res.status(500).json({ status: 'error', db: false, message: err.message });
+    await pool.query("select 1");
+    res.status(200).json({ status: "ok", db: true });
+  } catch (e) {
+    res.status(500).json({ status: "error", db: false, message: e.message });
   }
 }
