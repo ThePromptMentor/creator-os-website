@@ -1,0 +1,16 @@
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Tests and local data
+coverage/
+*.local.*
+.env.local
+.env.*.local

@@ -1,65 +1,71 @@
-﻿"use client";
-import { useState } from "react";
+﻿'use client';
+
+import React from 'react';
 
 export default function JoinPage() {
-const [email, setEmail] = useState("");
-const [name, setName] = useState("");
-const [status, setStatus] = useState("idle");
-const [message, setMessage] = useState("");
+  const [email, setEmail] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [source, setSource] = React.useState('website');
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [status, setStatus] = React.useState<'idle' | 'submitting' | 'done'>('idle');
 
-async function onSubmit(e) {
-e.preventDefault();
-setStatus("submitting");
-setMessage("");
-try {
-const res = await fetch("/api/join", {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ email, name, source: "website" })
-});
-const data = await res.json();
-if (!res.ok) throw new Error(data.error || "Failed to join");
-setStatus("done");
-setMessage("Thanks! You're on the list.");
-setEmail("");
-setName("");
-} catch (err) {
-setStatus("error");
-setMessage(err.message || "Something went wrong.");
-}
-}
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus('submitting');
+    setMessage(null);
+    try {
+      const res = await fetch('/api/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name, source }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Failed to join');
+      }
+      setMessage('Thanks! We’ll be in touch shortly.');
+      setStatus('done');
+      setEmail('');
+      setName('');
+    } catch (err: any) {
+      setMessage(err.message || 'Something went wrong.');
+      setStatus('idle');
+    }
+  }
 
-return (
-<main style={{ padding: "64px 24px", maxWidth: 640, margin: "0 auto" }}>
-<h1 style={{ fontSize: 36, marginBottom: 16 }}>Join the Founders Circle
-<p style={{ opacity: 0.9, marginBottom: 24 }}>
-Early access, updates, and an invite to the presale.
-
-<form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
-<input
-type="text"
-placeholder="Your name (optional)"
-value={name}
-onChange={(e) => setName(e.target.value)}
-style={{ padding: 12, borderRadius: 8, border: "1px solid #333", background: "#111", color: "#fff" }}
-/>
-<input
-type="email"
-placeholder="Email"
-required
-value={email}
-onChange={(e) => setEmail(e.target.value)}
-style={{ padding: 12, borderRadius: 8, border: "1px solid #333", background: "#111", color: "#fff" }}
-/>
-<button
-type="submit"
-disabled={status === "submitting"}
-style={{ padding: "12px 20px", borderRadius: 8, background: "#fff", color: "#111", fontWeight: 600 }}
->
-{status === "submitting" ? "Submitting..." : "Join"}
-
-{message && <p style={{ marginTop: 8, opacity: 0.9 }}>{message}}
-
-
-);
+  return (
+    <main className="p-8 max-w-lg mx-auto">
+      <h1 className="text-2xl font-semibold mb-4">Join the waitlist</h1>
+      <form onSubmit={onSubmit} className="space-y-3">
+        <input
+          type="email"
+          required
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          type="text"
+          placeholder="Your name (optional)"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          type="hidden"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+        />
+        <button
+          type="submit"
+          disabled={status === 'submitting'}
+          className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
+        >
+          {status === 'submitting' ? 'Submitting...' : 'Join'}
+        </button>
+      </form>
+      {message && <p style={{ marginTop: 8, opacity: 0.9 }}>{message}</p>}
+    </main>
+  );
 }
