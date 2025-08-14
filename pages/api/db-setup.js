@@ -12,9 +12,12 @@ function getPool() {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  // Accept both POST and GET to avoid 308→GET redirect issues in some clients
+  if (req.method !== "POST" && req.method !== "GET") {
+    res.setHeader("Allow", "GET, POST");
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
+
   if (!process.env.DATABASE_URL) {
     return res.status(503).json({ ok: false, error: "DATABASE_URL not set" });
   }
