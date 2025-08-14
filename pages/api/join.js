@@ -16,13 +16,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
+  if (!process.env.DATABASE_URL) {
+    return res.status(503).json({ ok: false, error: "DATABASE_URL not set" });
+  }
+
   const { email, name, source } = req.body || {};
   if (!email || typeof email !== "string") {
     return res.status(400).json({ ok: false, error: "Valid email required" });
   }
 
   try {
-    const pool = getPool();
     const sql = `
       INSERT INTO public.leads (email, name, source)
       VALUES ($1, $2, $3)
@@ -32,7 +35,7 @@ export default async function handler(req, res) {
       RETURNING id, email, created_at
     `;
     const params = [email.trim().toLowerCase(), name || null, source || "website"];
-    const { rows } = await pool.query(sql, params);
+    const { rows } = await getPool().query(sql, params);
     return res.status(200).json({ ok: true, lead: rows[0] });
   } catch (err) {
     console.error("join api error", err);
