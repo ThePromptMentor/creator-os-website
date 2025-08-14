@@ -1,3 +1,24 @@
+/* EMERGENCY NUCLEAR FIX - Force all SVGs to reasonable sizes */
+svg {
+    max-width: 48px !important;
+    max-height: 48px !important;
+    width: 24px !important;
+    height: 24px !important;
+}
+
+/* Specific fix for the massive SVGs */
+svg.w-6, svg.h-6, svg[class*="w-6"], svg[class*="h-6"] {
+    width: 24px !important;
+    height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+}
+
+/* Safety net for any large graphics */
+img, svg {
+    max-width: 100px !important;
+    max-height: 100px !important;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
